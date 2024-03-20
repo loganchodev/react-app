@@ -1,70 +1,108 @@
 import './App.css';
+import {useState} from 'react';
 
 function Header(props){
-  console.log('props', props.title)
+  
+  //console.log('props', props.title)
+
   return(
     <header>
-      <h1><a href="/" onClick={(event)=>{
+       <h1><a href="/" onClick={(event)=>{
         event.preventDefault();
         props.onChangeMode();
-      }}>{props.title}</a></h1>
+       }}>{props.title}</a></h1>
     </header>
   )
 }
 
 function Nav(props){
   const lis = []
-  for(let i = 0; i < props.topics.length; i++){
+
+  for(let i=0; i<props.topics.length; i++){
     let t = props.topics[i];
     lis.push(<li key={t.id}>
       <a id={t.id} href={'/read/'+t.id} onClick={event=>{
         event.preventDefault();
-        props.onChangeMode(event.target.id);
-      }}>  
-      {t.title}</a></li>)
+        props.onChangeMode(Number(event.target.id));
+      }}>{t.title}</a>
+    </li>);
   }
   return(
     <nav>
-    <ol>
-      {lis}
-    </ol>
-  </nav>
+        <ol>
+          {lis}
+        </ol>
+      </nav>
   )
 }
 
 function Article(props){
+  
   return(
     <article>
-      <h2>{props.title}</h2>
-      {props.body}
+        <h2>{props.title}</h2>
+        {props.body}
+      </article>
+  )
+}
+
+function Create (){
+
+  return(
+    <article>
+      <h2>Create</h2>
+      <p><input type="text" name="title" placeholder='title' /></p>
+      <p><textarea placeholder='body' name="body"/></p>
+      <p><input type="submit" value="Create"></input></p>
     </article>
   )
 }
 
 function App() {
-  const mode = 'WELCOME';
+
+  const [mode, setMode] = useState('WELCOME');
+  const [id, setId] = useState('')
+
   const topics = [
-    {id:1, title: 'html', body: 'html is ...'},
-    {id:2, title: 'css', body: 'css is ...'},
-    {id:3, title: 'javascript', body: 'javascript is ...'}
+    {id:1, title:'html', body:'html is ...'},
+    {id:2, title:'css', body:'css is ...'},
+    {id:3, title:'javascript', body:'javascript is ...'}
   ]
+
   let content = null;
-  if(mode === 'WELCOME'){
-    content = <Article title="Welcome" body="Hello, Web"></Article>
-  }else if(mode === 'READ'){
-    content = <Article title="Welcome" body="Hello, Read"></Article>
+  if(mode=== 'WELCOME'){
+    content = <Article title="welcome" body="Hello, web"></Article>
+  } else if(mode=== 'READ') {
+    let title, body = null;
+    for(let i=0; i<topics.length; i++){
+      console.log(topics[i].id, id);
+      if(topics[i].id === id){
+        title = topics[i].title;
+        body = topics[i].body;
+      }
+    }
+    content = <Article title={title} body={body}></Article>
+  } else if (mode=== 'CREATE'){
+    content = <Create></Create>
   }
+
   return (
     <div>
       <Header title="WEB" onChangeMode={()=>{
-        alert('Header');
+        setMode('WELCOME'); // setMode 함수를 호출하여 상태 값을 변경함
       }}></Header>
       <Nav topics={topics} onChangeMode={(id)=>{
-        alert(id);
+        setMode('READ'); // setMode 함수를 호출하여 상태 값을 변경함
+        setId(id)
       }}></Nav>
       {content}
+      <a href='/create' onClick={event=>{
+        event.preventDefault();
+        setMode('CREATE');
+      }}>Create</a>
     </div>
   );
 }
+
 
 export default App;
